@@ -1,20 +1,114 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useState } from "react"
+import Home from "./src/screen/home"
+import AddNote from "./src/screen/addNote"
+import EditNote from "./src/screen/editNote"
 
-export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
+const CurrentPageWidget = ({
+  currentPage,
+  noteList,
+  setCurrentPage,
+  addNote,
+  currentNote,
+  setCurrentNote,
+  updateNote,
+  deleteNote
+}) => {
+  switch (currentPage) {
+    case 'home':
+      return (
+        <Home 
+          noteList={noteList}
+          setCurrentPage={setCurrentPage}
+          setCurrentNote={setCurrentNote}
+          deleteNote={deleteNote}
+        />
+      )
+    case 'add':
+      return (
+        <AddNote 
+          setCurrentPage={setCurrentPage} 
+          addNote={addNote}
+        />
+      )
+    case 'edit':
+      return (
+        <EditNote 
+          setCurrentPage={setCurrentPage}
+          currentNote={currentNote}
+          updateNote={updateNote}
+        />
+      )
+    default:
+      <Home />
+      break;
+  }
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+
+const App = () => {
+  const [currentPage, setCurrentPage] = useState('home')
+  const [noteList, setNoteList] = useState([
+    {
+      id: 1,
+      title: "Note Pertama",
+      desc: "Lorem Ipsum is simply dummy text of the printing and typesetting industry",
+    },
+    {
+      id: 2,
+      title: "Note Kedua",
+      desc: "Lorem Ipsum is simply dummy text of the printing and typesetting industry",
+    },
+  ])
+  const [currentNote, setCurrentNote] = useState([])
+  
+  const addNote = (title, desc) => {
+    const id = noteList.length > 0 ? noteList[noteList.length - 1].id + 1 : 1
+  
+    setNoteList([
+      ...noteList,
+      {
+        id,
+        title: title,
+        desc: desc,
+      },
+    ])
+  }
+
+  const updateNote = (id, title, desc) => {
+    const updateNote = noteList.map(note => {
+      if (note.id === id) {
+        return {
+          id,
+          title,
+          desc
+        }
+      }
+      return note
+    })
+
+    setNoteList(updateNote)
+  }
+
+  const deleteNote = (id) => {
+    const deleteNote = noteList.filter(note => {
+      return note.id !== id
+    })
+
+    setNoteList(deleteNote)
+  }
+  
+  return (
+    <CurrentPageWidget
+      currentPage={currentPage}
+      setCurrentPage={setCurrentPage}
+      noteList={noteList}
+      addNote={addNote}
+      currentNote={currentNote}
+      setCurrentNote={setCurrentNote}
+      updateNote={updateNote}
+      deleteNote={deleteNote}
+    />
+  )
+}
+
+export default App
